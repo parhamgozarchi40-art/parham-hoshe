@@ -3,130 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ربات هوش مصنوعی 🤖</title>
+    <title>ربات هوش مصنوعی پرهام 🤖</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;400;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Vazirmatn', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
         }
         .chat-container {
-            height: calc(100vh - 160px);
+            height: calc(100vh - 180px);
+            min-height: 400px;
         }
         ::-webkit-scrollbar {
             width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
         }
         ::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 10px;
         }
+        .message-user {
+            background: #3b82f6;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 18px 18px 4px 18px;
+            max-width: 80%;
+            align-self: flex-end;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+        }
+        .message-bot {
+            background: #f1f5f9;
+            color: #1e293b;
+            padding: 12px 18px;
+            border-radius: 18px 18px 18px 4px;
+            max-width: 80%;
+            align-self: flex-start;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        .typing-indicator {
+            display: inline-block;
+            background: #f1f5f9;
+            padding: 12px 20px;
+            border-radius: 18px 18px 18px 4px;
+            align-self: flex-start;
+        }
+        .typing-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #94a3b8;
+            margin: 0 3px;
+            animation: typing 1.4s infinite both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-6px); opacity: 1; }
+        }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body>
 
-    <div class="w-full max-w-2xl bg-white/80 backdrop-blur-md shadow-2xl rounded-3xl overflow-hidden flex flex-col border border-white/20">
+    <div class="w-full max-w-2xl bg-white/90 backdrop-blur-md shadow-2xl rounded-3xl overflow-hidden flex flex-col border border-white/30">
         
         <!-- Header -->
-        <div class="bg-white/50 p-5 border-b border-gray-200 flex items-center justify-between">
+        <div class="bg-white/60 p-5 border-b border-gray-200 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white shadow-lg">🤖</div>
+                <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white shadow-lg text-xl">
+                    🤖
+                </div>
                 <div>
-                    <h1 class="font-bold text-gray-800">ربات هوشمند</h1>
+                    <h1 class="font-bold text-gray-800 text-lg">ربات پرهام</h1>
                     <p class="text-xs text-green-500 flex items-center gap-1">
                         <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> آنلاین
                     </p>
                 </div>
             </div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">v2.0</span>
+                <button onclick="clearChat()" class="text-xs text-gray-400 hover:text-red-500 transition" title="پاک کردن تاریخچه">
+                    🗑️
+                </button>
+            </div>
         </div>
 
         <!-- Chat Window -->
-        <div id="chat-window" class="chat-container overflow-y-auto p-6 space-y-4 flex flex-col">
-            <div class="self-start bg-gray-100 text-gray-700 p-4 rounded-2xl rounded-tr-none max-w-[80%] shadow-sm">
-                سلام! من آماده‌ام. چه کمکی می‌تونم بکنم؟ 😊
+        <div id="chat-window" class="chat-container overflow-y-auto p-6 space-y-3 flex flex-col bg-gray-50/30">
+            <!-- Welcome Message -->
+            <div class="message-bot">
+                سلام! من ربات هوشمند پرهام هستم. 🤖✨<br>
+                هر سوالی داری، بپرس!
             </div>
         </div>
 
         <!-- Input Area -->
-        <div class="p-4 bg-white/50 border-t border-gray-200">
-            <div class="relative flex items-center">
+        <div class="p-4 bg-white/60 border-t border-gray-200">
+            <div class="relative flex items-center gap-2">
                 <input type="text" id="user-input" 
-                    class="w-full p-4 pr-4 pl-14 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all shadow-sm text-gray-700"
-                    placeholder="پیام خود را اینجا بنویسید...">
-                <button id="send-btn" class="absolute left-2 p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all shadow-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    class="flex-1 p-4 pr-4 pl-14 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all shadow-sm text-gray-700 placeholder:text-gray-400"
+                    placeholder="پیام خود را اینجا بنویسید..." 
+                    autofocus>
+                
+                <button id="send-btn" class="absolute left-3 p-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                     </svg>
                 </button>
             </div>
-            <p class="text-[10px] text-center text-gray-400 mt-2">🚀 Powered by Cloudflare Workers</p>
+            <div class="flex justify-between mt-2 px-1">
+                <p class="text-[10px] text-gray-400">🚀 Powered by Cloudflare Workers & Gemini AI</p>
+                <p class="text-[10px] text-gray-400" id="char-count">۰ کاراکتر</p>
+            </div>
         </div>
     </div>
 
     <script>
+        // ===== عناصر DOM =====
         const chatWindow = document.getElementById('chat-window');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
+        const charCount = document.getElementById('char-count');
 
         // ===== آدرس Worker شما =====
         const WORKER_URL = 'https://delicate-wood-5c58.parhamgozarchi40.workers.dev';
 
+        // ===== شمارنده کاراکتر =====
+        userInput.addEventListener('input', () => {
+            const len = userInput.value.length;
+            charCount.textContent = len + ' کاراکتر';
+        });
+
+        // ===== تابع نمایش پیام =====
         function appendMessage(role, text) {
             const msgDiv = document.createElement('div');
-            msgDiv.className = role === 'user' 
-                ? 'self-end bg-blue-500 text-white p-4 rounded-2xl rounded-tl-none max-w-[80%] shadow-md'
-                : 'self-start bg-gray-100 text-gray-700 p-4 rounded-2xl rounded-tr-none max-w-[80%] shadow-sm';
-            msgDiv.innerText = text;
+            msgDiv.className = role === 'user' ? 'message-user' : 'message-bot';
+            
+            // تبدیل نشون دادن لینک‌ها
+            if (role === 'assistant') {
+                const linkified = text.replace(
+                    /(https?:\/\/[^\s]+)/g, 
+                    '<a href="$1" target="_blank" class="text-blue-600 underline">$1</a>'
+                );
+                msgDiv.innerHTML = linkified;
+            } else {
+                msgDiv.textContent = text;
+            }
+            
             chatWindow.appendChild(msgDiv);
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
 
+        // ===== تابع نمایش تایپینگ =====
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+            `;
+            chatWindow.appendChild(typingDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            return typingDiv;
+        }
+
+        // ===== تابع ارسال پیام =====
         async function sendMessage() {
             const message = userInput.value.trim();
             if (!message) return;
 
+            // نمایش پیام کاربر
             appendMessage('user', message);
             userInput.value = '';
+            charCount.textContent = '۰ کاراکتر';
+            userInput.focus();
 
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'self-start bg-gray-200 text-gray-500 p-3 rounded-xl text-sm animate-pulse';
-            loadingDiv.innerText = 'در حال فکر کردن... 🤔';
-            chatWindow.appendChild(loadingDiv);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
+            // نمایش تایپینگ
+            const typingEl = showTyping();
 
             try {
                 const response = await fetch(WORKER_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        message: message
-                    })
+                    body: JSON.stringify({ message: message })
                 });
 
-                const data = await response.json();
-                chatWindow.removeChild(loadingDiv);
+                // حذف تایپینگ
+                typingEl.remove();
 
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `خطای سرور (${response.status})`);
+                }
+
+                const data = await response.json();
+                
                 if (data.choices && data.choices[0] && data.choices[0].message) {
                     const aiResponse = data.choices[0].message.content;
                     appendMessage('assistant', aiResponse);
                 } else if (data.error) {
                     throw new Error(data.error);
                 } else {
-                    throw new Error('پاسخی دریافت نشد');
+                    throw new Error('پاسخی از سرور دریافت نشد');
                 }
 
             } catch (error) {
-                chatWindow.removeChild(loadingDiv);
+                typingEl.remove();
                 appendMessage('assistant', '❌ خطا: ' + error.message);
+                console.error('Error details:', error);
             }
         }
 
+        // ===== تابع پاک کردن تاریخچه =====
+        function clearChat() {
+            const messages = chatWindow.querySelectorAll('.message-user, .message-bot');
+            messages.forEach(el => el.remove());
+            // پیام خوش‌آمدگویی دوباره
+            const welcome = document.createElement('div');
+            welcome.className = 'message-bot';
+            welcome.textContent = 'سلام! من ربات هوشمند پرهام هستم. 🤖✨\nهر سوالی داری، بپرس!';
+            chatWindow.appendChild(welcome);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // ===== رویدادها =====
         sendBtn.addEventListener('click', sendMessage);
         userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
         });
+
+        // ===== فوکوس اولیه =====
+        userInput.focus();
     </script>
 </body>
 </html>
